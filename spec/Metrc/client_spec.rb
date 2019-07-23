@@ -11,16 +11,27 @@ describe Metrc::Client do
     let(:licenseNumber) { 'CML17-0000001' }
     let(:api_url) { "/foo/v1/bar?licenseNumber=#{licenseNumber}" }
     let(:api_post) { subject.api_post(api_url) }
+    let(:body) { "" }
 
     before(:each) do
       stub_request(:post, "#{$spec_credentials['base_uri']}#{api_url}")
-        .to_return(status: status)
+        .to_return(status: status, body: body, headers: { 'content-type': 'application/json' })
     end
 
     context 'Metrc API returns 400' do
       let(:status) { 400 }
       it 'raises an error' do
         expect { api_post }.to(raise_error(Metrc::Errors::BadRequest))
+      end
+
+      context 'with a simple error' do
+        let(:body) do
+          { 'Message': 'No data was submitted.' }.to_json
+        end
+
+        it 'stores the error message' do
+          expect { api_post }.to(raise_error(/No data was submitted./))
+        end
       end
     end
 
@@ -57,6 +68,17 @@ describe Metrc::Client do
       it 'raises an error' do
         expect { api_post }.to(raise_error(Metrc::Errors::InternalServerError))
       end
+
+      # TODO: enhance error capturing for 500s once response format is known
+      #context 'with a simple error' do
+      #  let(:body) do
+      #    { 'Message': 'No data was submitted.' }.to_json
+      #  end
+
+      #  it 'stores the error message' do
+      #    expect { api_post }.to(raise_error('No data was submitted.'))
+      #  end
+      #end
     end
   end
 end
