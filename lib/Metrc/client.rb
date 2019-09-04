@@ -191,7 +191,7 @@ module Metrc
 
     def auth_headers
       {
-        authorization: 'Basic ' + Base64::encode64("#{configuration.api_key}:#{user_key}")
+        authorization: 'Basic ' + Base64::encode64("#{configuration.api_key}:#{user_key}").delete("\r\n")
       }
     end
 
