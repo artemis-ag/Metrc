@@ -28,7 +28,7 @@ module Metrc
     end
 
     def api_get(url, options = {})
-      options.merge!(basic_auth: auth_headers)
+      options.merge!(headers: auth_headers)
       puts "\nMetrc API Request debug\nclient.get('#{url}', #{options})\n########################\n" if debug
       self.response = self.class.get(url, options)
       raise_request_errors
@@ -39,7 +39,7 @@ module Metrc
     end
 
     def api_post(url, options = {})
-      options.merge!(basic_auth: auth_headers)
+      options.merge!(headers: auth_headers)
       puts "\nMetrc API Request debug\nclient.post('#{url}', #{options})\n########################\n" if debug
       self.response = self.class.post(url, options)
       raise_request_errors
@@ -50,7 +50,7 @@ module Metrc
     end
 
     def api_delete(url, options = {})
-      options.merge!(basic_auth: auth_headers)
+      options.merge!(headers: auth_headers)
       puts "\nMetrc API Request debug\nclient.delete('#{url}', #{options})\n########################\n" if debug
       self.response = self.class.delete(url, options)
       raise_request_errors
@@ -61,7 +61,7 @@ module Metrc
     end
 
     def api_put(url, options = {})
-      options.merge!(basic_auth: auth_headers)
+      options.merge!(headers: auth_headers)
       puts "\nMetrc API Request debug\nclient.put('#{url}', #{options})\n########################\n" if debug
       self.response = self.class.put(url, options)
       raise_request_errors
@@ -190,8 +190,9 @@ module Metrc
     private
 
     def auth_headers
-      # change configuration.user_key to use database user_key
-      { username: configuration.api_key, password: user_key }
+      {
+        authorization: 'Basic ' + Base64::encode64("#{configuration.api_key}:#{user_key}")
+      }
     end
 
     def sign_in
