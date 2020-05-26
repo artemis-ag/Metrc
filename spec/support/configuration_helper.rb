@@ -4,7 +4,7 @@ module ConfigurationHelper
       config.api_key  = $spec_credentials['api_key']
       config.user_key = $spec_credentials['user_key']
       config.sandbox  = $spec_credentials['sandbox']
-      config.state    = state
+      config.state    = state.downcase
     end
   end
 end

@@ -5,7 +5,6 @@ module Metrc
   class Client
     include HTTParty
     headers 'Content-Type' => 'application/json'
-    NEW_PACKAGE_PLANTING_STATES = Set.new([:ca]).freeze
 
     attr_accessor :debug,
                   :response,
@@ -164,9 +163,11 @@ module Metrc
     end
 
     def create_plant_batch_package(license_number, resources)
-      uri = '/plantbatches/v1/createpackages'
-
-      uri = '/plantbatches/v1/create/plantings' if NEW_PACKAGE_PLANTING_STATES.include?(configuration.state.to_sym)
+      uri = if configuration.state.to_sym == :ca
+        '/plantbatches/v1/create/plantings'
+      else
+        '/plantbatches/v1/createpackages'
+      end
 
       api_post("#{uri}?licenseNumber=#{license_number}", body: resources.to_json)
     end
