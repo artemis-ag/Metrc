@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+require 'bundler/setup'
+require 'yaml'
+require 'Metrc'
+
+credentials = YAML.load_file('./spec/spec_credentials.yml')
+tags = []
+
+Metrc.configure do |config|
+  config.user_key = credentials['user_key']
+  config.api_key  = credentials['api_key']
+  config.state    = credentials['state']
+  config.sandbox  = true
+end
+
+license  = credentials['license']
+batch_id = 'ABCDEF012345670000015393'
+client = Metrc::Client.new(user_key: credentials['user_key'])
+
+tags.each do |tag|
+  next unless tag
+
+  begin
+    # payload = [
+    #   {
+    #     Name: batch_id,
+    #     Type: 'Clone',
+    #     Count: 3,
+    #     Strain: 'Dragonfly Kush',
+    #     Location: 'Baby Room',
+    #     Room: 'Baby Room',
+    #     PatientLicenseNumber: nil,
+    #     ActualDate: '2020-05-28'
+    #   }
+    # ]
+
+    # p "Creating batch with tag: #{tag}"
+    # client.create_plant_batches(license, payload)
+
+    # payload = [
+    #   {
+    #     PlantBatch: batch_id,
+    #     Count: 3,
+    #     Location: 'Product Vault',
+    #     Room: 'Product Vault',
+    #     Item: 'BLZ Immature Plant Item',
+    #     Tag: tag,
+    #     PatientLicenseNumber: nil,
+    #     Note: '',
+    #     IsTradeSample: false,
+    #     IsDonation: false,
+    #     ActualDate: '2020-05-29'
+    #   }
+    # ]
+    # p "Packaging planting: #{payload}"
+    # client.create_plant_batch_package(license, payload)
+
+    p "IT WORKED! #{tag}"
+    p "\n\n\n"
+    exit 0
+  rescue => e
+    p e
+    p '=' * 120
+    next
+  end
+end

@@ -1,0 +1,126 @@
+#!/usr/bin/env ruby
+require 'yaml'
+require 'Metrc'
+
+credentials = YAML.load_file('./spec/credentials.yml')
+
+state = {
+  license: credentials['license'],
+  batch_id: 'ABC',
+  items: []
+}
+
+Metrc.configure do |config|
+  config.user_key = credentials['user_key']
+  config.api_key  = credentials['api_key']
+  config.state    = credentials['state']
+  config.sandbox  = true
+end
+
+batch_id = state[:batch_id]
+client = Metrc::Client.new()
+p "Launching #{state[:name].upcase} state, with license #{license}, and API #{client.uri}"
+
+begin
+  p "Getting room"
+  room = client.get_room('Drying Room')
+  p room.inspect
+
+  p '-' * 60
+
+  p "Getting Strain"
+  strain = client.get_strain('B3X7')
+  p strain.inspect
+
+  p '-' * 60
+
+  # Create plantings
+  payload = [
+    {
+      Name: batch_id,
+      Type: 'Clone',
+      Count: 3,
+      Strain: 'B3X7',
+      Room: 'Drying Room',
+      PatientLicenseNumber: nil,
+      ActualDate: '2019-10-01'
+    }
+  ]
+  plant_bach = client.create_plant_batches(license, payload)
+
+  p "Getting Plant Batch"
+  plant_bach = client.get(:plantbaches, plant_bach[:id])
+  p plant_bach.inspect
+
+  p '-' * 60
+
+  # Change growth phase
+  payload = [
+    {
+      Name: batch_id,
+      Count: 2,
+      StartingTag: state[:items].first,
+      GrowthPhase: 'Vegetative',
+      NewRoom: 'Flowering',
+      GrowthDate: '2019-10-02',
+      PatientLicenseNumber: nil
+    }
+  ]
+  plants = client.change_growth_phase(license, payload)
+
+  p "Getting Plant"
+  plant = client.get(:plants, plants.first[:id])
+  p plant.inspect
+
+  p '-' * 60
+
+  # Change growth phase in order
+  # to harvest the plant
+  payload = []
+  state[:items].each do |item|
+    payload << {
+      Id: nil,
+      Label: item,
+      NewTag: nil,
+      GrowthPhase: 'Flowering',
+      NewRoom: 'Plants Room',
+      GrowthDate: '2019-10-04'
+    }
+  end
+  client.change_plant_growth_phase(license, payload)
+
+  p "Getting Harvest"
+  harvest = client.get(:plants, state[:items].first)
+  p harvest.inspect
+
+  p '-' * 60
+
+  p "Getting Item"
+  item = client.get(:items, state[:items].first)
+  p item.inspect
+
+  p '-' * 60
+
+  p "Getting Package"
+  harvest = client.get(:items, state[:items].first)
+  p plant.inspect
+
+  p '-' * 60
+
+  # p "Getting Sale Receipt"
+  # harvest = client.get(:items, state[:items].first)
+  # p plant.inspect
+
+  # p '-' * 60
+
+  # p "Getting Lab Tests"
+  # harvest = client.get(:items, state[:items].first)
+  # p plant.inspect
+
+  # p '-' * 60
+
+  p '#' * 120
+rescue => exception
+  p "Issue found: #{exception}"
+  exit 1
+end

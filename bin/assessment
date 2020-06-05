@@ -1,0 +1,193 @@
+#!/usr/bin/env ruby
+require 'bundler/setup'
+require 'yaml'
+require 'Metrc'
+
+credentials = YAML.load_file('./spec/spec_credentials.yml')
+
+state = {
+  license: credentials['license'],
+  batch_id: 'ABCDEF012345670000015393',
+  items: [
+    '1A4FF00000000C9000000704',
+    '1A4FF00000000C9000000705',
+    '1A4FF00000000C9000000706'
+  ]
+}
+
+Metrc.configure do |config|
+  config.user_key = credentials['user_key']
+  config.api_key  = credentials['api_key']
+  config.state    = credentials['state']
+  config.sandbox  = true
+end
+
+license  = credentials['license']
+batch_id = state[:batch_id]
+client = Metrc::Client.new(user_key: credentials['user_key'], debug: true)
+p "Launching #{credentials['state'].upcase} state, with license #{license}, and API #{client.uri}"
+
+begin
+  # Create plantings
+  payload = [
+    {
+      Name: batch_id,
+      Type: 'Clone',
+      Count: 6,
+      Strain: 'Dragonfly Kush',
+      Location: 'Baby Room',
+      Room: 'Baby Room',
+      PatientLicenseNumber: nil,
+      ActualDate: '2020-05-28'
+    }
+  ]
+  # p "Planting: #{payload}"
+  # client.create_plant_batches(license, payload)
+
+  # Create planting package
+  payload = [
+    {
+      PlantBatch: batch_id,
+      Count: 3,
+      Location: 'Product Vault',
+      Room: 'Product Vault',
+      Item: 'BLZ Immature Plant Item',
+      Tag: '1A4FF01000000C9000000096',
+      PatientLicenseNumber: nil,
+      Note: '',
+      IsTradeSample: false,
+      IsDonation: false,
+      ActualDate: '2020-05-29'
+    }
+  ]
+  # p "Packaging planting: #{payload}"
+  # client.create_plant_batch_package(license, payload)
+  # item = state[:items].first
+  # state[:items] -= [item]
+
+  # Change growth phase
+  payload = [
+    {
+      Name: batch_id,
+      Count: 2,
+      StartingTag: state[:items].first,
+      GrowthPhase: 'Vegetative',
+      NewRoom: 'Flowering Room',
+      NewLocation: 'Flowering Room',
+      GrowthDate: '2020-06-01',
+      PatientLicenseNumber: nil
+    }
+  ]
+  p "Changing growth phase: #{payload}"
+  client.change_growth_phase(license, payload)
+
+  # Destroy plant batch
+  payload = [
+    {
+      PlantBatch: batch_id,
+      Count: 1,
+      ReasonNote: 'Other: needz more cowbell',
+      ActualDate: '2020-06-01'
+    }
+  ]
+  p "Destroying plant batch: #{payload}"
+  client.destroy_plant_batches(license, payload)
+
+  # Change plants growth phase
+  item = state[:items].sample
+  plant_step_1 = item
+  payload = [
+    {
+      Label: item,
+      NewTag: nil,
+      GrowthPhase: 'Flowering',
+      NewLocation: 'Flowering Room',
+      NewRoom: 'Flowering Room',
+      GrowthDate: '2020-06-01'
+    }
+  ]
+  p "Changing plants growth phase: #{payload}"
+  client.change_plant_growth_phase(license, payload)
+
+  # Move plants
+  payload = [
+    {
+      Id: nil,
+      Label: item,
+      Room: 'Flowering Room',
+      Location: 'Flowering Room',
+      ActualDate: '2020-06-01'
+    }
+  ]
+  p "Moving plant: #{payload}"
+  client.move_plants(license, payload)
+
+  # Destroy plants
+  item = state[:items].sample
+  payload = [
+    {
+      Id: nil,
+      Label: item,
+      ReasonNote: 'Other: needz more cowbell',
+      ActualDate: '2020-06-02'
+    }
+  ]
+  p "Destroying plant: #{payload}"
+  client.destroy_plants(license, payload)
+  state[:items] -= [item]
+
+  # Manicure plants
+  item = plant_step_1
+  payload = [
+    {
+      Plant: item,
+      Weight: 100.23,
+      UnitOfWeight: 'Grams',
+      DryingRoom: 'X2',
+      DryingLocation: 'X2',
+      ActualDate: '2020-06-03',
+      PatientLicenseNumber: nil,
+      HarvestName: nil
+    }
+  ]
+  p "Manicure plant: #{payload}"
+  client.manicure_plants(license, payload)
+
+  # Change growth phase in order
+  # to harvest the plant
+  # item = state[:items].sample
+  # payload = [
+  #   {
+  #     Id: nil,
+  #     Label: item,
+  #     NewTag: nil,
+  #     GrowthPhase: 'Flowering',
+  #     NewRoom: 'Plants Room',
+  #     NewLocation: 'Plants Room',
+  #     GrowthDate: '2020-06-03'
+  #   }
+  # ]
+  # p "Changing plant growth phase: #{payload}"
+  # client.change_plant_growth_phase(license, payload)
+
+  # Harvest plants
+  payload = [
+    {
+      Plant: item,
+      Weight: 100.23,
+      UnitOfWeight: 'Grams',
+      DryingRoom: 'X2',
+      DryingLocation: 'X2',
+      ActualDate: '2020-06-04',
+      PatientLicenseNumber: nil,
+      HarvestName: nil
+    }
+  ]
+  p "Harvesting plant: #{payload}"
+  client.harvest_plants(license, payload)
+  p "Done on #{credentials['state'].upcase} state, with license #{license}!"
+  p '#' * 120
+rescue => exception
+  p "Issue found: #{exception}"
+  exit 1
+end
