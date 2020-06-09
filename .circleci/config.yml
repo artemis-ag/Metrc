@@ -1,11 +1,9 @@
 version: 2
-orbs:
-  ruby: circleci/ruby@0.1.2
 
 jobs:
   build:
     docker:
-      - image: circleci/ruby:2.3.1-stretch
+      - image: circleci/ruby:2.3.6-stretch
 
     steps:
       - checkout
@@ -24,7 +22,7 @@ jobs:
 
   rubocop:
     docker:
-      - image: circleci/ruby:2.3.1-stretch
+      - image: circleci/ruby:2.3.6-stretch
 
     steps:
       - checkout
@@ -40,7 +38,7 @@ jobs:
 
   unit_tests:
     docker:
-      - image: circleci/ruby:2.3.1-stretch
+      - image: circleci/ruby:2.3.6-stretch
 
     steps:
       - checkout
