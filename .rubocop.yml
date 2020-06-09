@@ -3,9 +3,12 @@ require:
 
 AllCops:
   Exclude:
+    - 'bin/console'
     - 'bin/assessment'
     - 'bin/tag-finder'
     - 'bin/data-fetcher'
+    - 'spec/support/*'
+    - 'spec/spec_helper.rb'
     - 'vendor/**/*'
 
 Layout/LineLength:
@@ -122,6 +125,9 @@ Style/HashEachMethods:
   Enabled: false
 
 Style/HashTransformKeys:
+  Enabled: false
+
+Style/RedundantSelf:
   Enabled: false
 
 Style/HashTransformValues:

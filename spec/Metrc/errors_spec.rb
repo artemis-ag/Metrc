@@ -4,7 +4,7 @@ describe Metrc::Errors do
   let(:subject) { described_class }
 
   describe '.parse_request_errors' do
-    let(:body) { Hash.new }
+    let(:body) { {} }
     let(:response) do
       double(HTTParty::Response, parsed_response: body)
     end
@@ -16,7 +16,7 @@ describe Metrc::Errors do
       end
 
       it 'stores the error message' do
-        expect(parse_request_errors).to match /No data was submitted./
+        expect(parse_request_errors).to match(/No data was submitted./)
       end
     end
 
@@ -29,8 +29,8 @@ describe Metrc::Errors do
       end
 
       it 'consolidates the error message from the api' do
-        expect(parse_request_errors).to match /Room Id was not specified/
-        expect(parse_request_errors).to match /Room "My Room" already exists in the current Facility/
+        expect(parse_request_errors).to match(/Room Id was not specified/)
+        expect(parse_request_errors).to match(/Room "My Room" already exists in the current Facility/)
       end
     end
 
@@ -43,8 +43,8 @@ describe Metrc::Errors do
       end
 
       it 'captures the error message for each row' do
-        expect(parse_request_errors).to match /0: Room Id was not specified/
-        expect(parse_request_errors).to match /1: Room "My Room" already exists in the current Facility/
+        expect(parse_request_errors).to match(/0: Room Id was not specified/)
+        expect(parse_request_errors).to match(/1: Room "My Room" already exists in the current Facility/)
       end
     end
   end

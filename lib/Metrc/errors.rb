@@ -24,15 +24,15 @@ module Metrc
       private
 
       def consolidate_errors_by_row(array)
-        array.reduce({}) do |errors, row|
+        array.each_with_object({}) do |errors, row|
           index = row['row']
           if errors[index]
-            errors[index] += ", #{row["message"]}"
+            errors[index] += ', ' + row['message']
           else
             errors[index] = row['message']
           end
           errors
-        end.map do |index, message|
+        end.map do |index, message| # rubocop:disable Style/MultilineBlockChain
           "#{index}: #{message}"
         end
       end

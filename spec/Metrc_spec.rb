@@ -1,3 +1,4 @@
+# rubocop:disable Naming/FileName,Lint/MissingCopEnableDirective
 require 'spec_helper'
 
 describe Metrc do
@@ -9,11 +10,11 @@ describe Metrc do
 
   it 'accepts a configuration, requires a complete configuration' do
     Metrc.configure do |config|
-      config.state  = nil
+      config.state = nil
     end
 
-    expect(Metrc.configuration.api_key).to eq($spec_credentials['api_key'])
-    expect(Metrc.configuration.user_key).to eq($spec_credentials['user_key'])
+    expect(Metrc.configuration.api_key).to eq($spec_credentials['api_key']) # rubocop:disable Style/GlobalVars
+    expect(Metrc.configuration.user_key).to eq($spec_credentials['user_key']) # rubocop:disable Style/GlobalVars
     expect(Metrc.configuration.incomplete?).to be_truthy
   end
 
@@ -46,10 +47,4 @@ describe Metrc do
 
     expect(client.uri).to eq('https://api-ca.metrc.com')
   end
-
-  # it 'communicates with the API to get users' do
-  # end
-  #
-  # it 'communicates with the API to get inventory' do
-  # end
 end

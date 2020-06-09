@@ -5,7 +5,7 @@ describe Metrc::Client do
     configure_client
   end
 
-  let(:subject) { described_class.new(user_key: $spec_credentials['user_key']) }
+  let(:subject) { described_class.new(user_key: $spec_credentials['user_key']) } # rubocop:disable Style/GlobalVars
   let(:licenseNumber) { 'CML17-0000001' }
   let(:headers) do
     { 'content-type': 'application/json' }
@@ -14,7 +14,7 @@ describe Metrc::Client do
   describe '#api_post' do
     let(:api_url) { "/foo/v1/bar?licenseNumber=#{licenseNumber}" }
     let(:api_post) { subject.api_post(api_url) }
-    let(:body) { "" }
+    let(:body) { '' }
 
     before(:each) do
       stub_request(:post, "#{subject.uri}#{api_url}")
@@ -150,7 +150,7 @@ describe Metrc::Client do
         stub_request(:post, "#{subject.uri}/packages/v1/create/plantings?licenseNumber=#{licenseNumber}")
           .with(headers: headers)
           .to_return(body: nil)
-    end
+      end
 
       it 'calls the endpoint' do
         expect { subject.create_plantings_package(licenseNumber, []) }.not_to raise_error
@@ -284,7 +284,7 @@ describe Metrc::Client do
         stub_request(:post, "#{subject.uri}/harvests/v1/removewaste?licenseNumber=#{licenseNumber}")
           .with(headers: headers)
           .to_return(body: nil)
-     end
+      end
 
       it 'calls the endpoint' do
         expect { subject.remove_waste(licenseNumber, []) }.not_to raise_error
@@ -320,7 +320,6 @@ describe Metrc::Client do
       let(:query_params) { '' }
 
       before do
-        content_type = { 'content-type': 'application/json' }
         stub_request(:get, "#{subject.uri}/harvests/v1/active?licenseNumber=#{licenseNumber}#{query_params}")
           .with(headers: headers)
           .to_return(body: nil)
@@ -345,11 +344,10 @@ describe Metrc::Client do
   context 'transfers' do
     describe '#delete_transfer_template' do
       before(:each) do
-        content_type = { 'content-type': 'application/json' }
         stub_request(:delete, "#{subject.uri}/transfers/v1/templates/#{template_id}?licenseNumber=#{licenseNumber}")
           .with(headers: headers)
           .to_return(body: nil)
-    end
+      end
 
       let(:template_id) { 1 }
 
@@ -360,11 +358,10 @@ describe Metrc::Client do
 
     describe '#create_transfer_template' do
       before(:each) do
-        content_type = { 'content-type': 'application/json' }
         stub_request(:post, "#{subject.uri}/transfers/v1/templates?licenseNumber=#{licenseNumber}")
           .with(headers: headers)
           .to_return(body: nil)
-    end
+      end
 
       it 'calls the endpoint' do
         expect { subject.create_transfer_template(licenseNumber, []) }.not_to raise_error
@@ -375,11 +372,10 @@ describe Metrc::Client do
       let(:query_params) { '' }
 
       before do
-        content_type = { 'content-type': 'application/json' }
         stub_request(:get, "#{subject.uri}/transfers/v1/templates?licenseNumber=#{licenseNumber}#{query_params}")
           .with(headers: headers)
           .to_return(body: nil)
-    end
+      end
 
       it 'calls the endpoint' do
         expect { subject.list_transfer_templates(licenseNumber) }.not_to raise_error
