@@ -8,7 +8,7 @@ else
   $spec_credentials = {
     api_key: 'abc',
     user_key: 'bcd',
-    state: :ca
+    state: :ca,
     license: 'CML00-0000000'
   }
 end
