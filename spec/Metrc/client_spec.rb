@@ -74,15 +74,17 @@ describe Metrc::Client do
     end
   end
 
-  describe '#change_plant_growth_phase' do
-    before(:each) do
-      stub_request(:post, "#{subject.uri}/plants/v1/changegrowthphases?licenseNumber=#{licenseNumber}")
-        .with(headers: headers)
-        .to_return(body: nil)
-    end
+  context 'plants' do
+    describe '#change_plant_growth_phase' do
+      before(:each) do
+        stub_request(:post, "#{subject.uri}/plants/v1/changegrowthphases?licenseNumber=#{licenseNumber}")
+          .with(headers: headers)
+          .to_return(body: nil)
+      end
 
-    it 'calls the endpoint' do
-      expect { subject.change_plant_growth_phase(licenseNumber, []) }.not_to raise_error
+      it 'calls the endpoint' do
+        expect { subject.change_plant_growth_phase(licenseNumber, []) }.not_to raise_error
+      end
     end
   end
 
@@ -276,6 +278,18 @@ describe Metrc::Client do
 
       it 'calls the endpoint' do
         expect { subject.finish_harvest(licenseNumber, []) }.not_to raise_error
+      end
+    end
+
+    describe '#unfinish_harvest' do
+      before(:each) do
+        stub_request(:post, "#{subject.uri}/harvests/v1/unfinish?licenseNumber=#{licenseNumber}")
+          .with(headers: headers)
+          .to_return(body: nil)
+      end
+
+      it 'calls the endpoint' do
+        expect { subject.unfinish_harvest(licenseNumber, []) }.not_to raise_error
       end
     end
 
