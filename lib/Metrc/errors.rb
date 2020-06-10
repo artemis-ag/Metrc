@@ -24,7 +24,7 @@ module Metrc
       private
 
       def consolidate_errors_by_row(array)
-        array.each_with_object({}) do |errors, row|
+        array.reduce({}) do |errors, row| # rubocop:disable Style/CollectionMethods,Style/EachWithObject
           index = row['row']
           if errors[index]
             errors[index] += ', ' + row['message']
