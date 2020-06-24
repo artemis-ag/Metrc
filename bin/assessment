@@ -7,11 +7,11 @@ credentials = YAML.load_file('./spec/spec_credentials.yml')
 
 state = {
   license: credentials['license'],
-  batch_id: 'ABCDEF012345670000015393',
+  batch_id: 'ABCDEF012345670000015394',
   items: [
-    '1A4FF00000000C9000000704',
-    '1A4FF00000000C9000000705',
-    '1A4FF00000000C9000000706'
+    '1A4FF00000000C9000000714',
+    '1A4FF00000000C9000000715',
+    '1A4FF00000000C9000000716'
   ]
 }
 
@@ -52,7 +52,7 @@ begin
       Location: 'Product Vault',
       Room: 'Product Vault',
       Item: 'BLZ Immature Plant Item',
-      Tag: '1A4FF01000000C9000000096',
+      Tag: '1A4FF01000000C9000000996',
       PatientLicenseNumber: nil,
       Note: '',
       IsTradeSample: false,
@@ -62,8 +62,8 @@ begin
   ]
   # p "Packaging planting: #{payload}"
   # client.create_plant_batch_package(license, payload)
-  # item = state[:items].first
-  # state[:items] -= [item]
+  item = state[:items].first
+  state[:items] -= [item]
 
   # Change growth phase
   payload = [
@@ -78,8 +78,8 @@ begin
       PatientLicenseNumber: nil
     }
   ]
-  p "Changing growth phase: #{payload}"
-  client.change_growth_phase(license, payload)
+  # p "Changing growth phase: #{payload}"
+  # client.change_growth_phase(license, payload)
 
   # Destroy plant batch
   payload = [
@@ -90,8 +90,8 @@ begin
       ActualDate: '2020-06-01'
     }
   ]
-  p "Destroying plant batch: #{payload}"
-  client.destroy_plant_batches(license, payload)
+  # p "Destroying plant batch: #{payload}"
+  # client.destroy_plant_batches(license, payload)
 
   # Change plants growth phase
   item = state[:items].sample
@@ -106,8 +106,8 @@ begin
       GrowthDate: '2020-06-01'
     }
   ]
-  p "Changing plants growth phase: #{payload}"
-  client.change_plant_growth_phase(license, payload)
+  # p "Changing plants growth phase: #{payload}"
+  # client.change_plant_growth_phase(license, payload)
 
   # Move plants
   payload = [
@@ -119,8 +119,8 @@ begin
       ActualDate: '2020-06-01'
     }
   ]
-  p "Moving plant: #{payload}"
-  client.move_plants(license, payload)
+  # p "Moving plant: #{payload}"
+  # client.move_plants(license, payload)
 
   # Destroy plants
   item = state[:items].sample
@@ -132,12 +132,13 @@ begin
       ActualDate: '2020-06-02'
     }
   ]
-  p "Destroying plant: #{payload}"
-  client.destroy_plants(license, payload)
+  # p "Destroying plant: #{payload}"
+  # client.destroy_plants(license, payload)
   state[:items] -= [item]
 
   # Manicure plants
   item = plant_step_1
+  harvest_name = "#{item}-harvest-2020-06-03"
   payload = [
     {
       Plant: item,
@@ -147,30 +148,14 @@ begin
       DryingLocation: 'X2',
       ActualDate: '2020-06-03',
       PatientLicenseNumber: nil,
-      HarvestName: nil
+      HarvestName: harvest_name
     }
   ]
-  p "Manicure plant: #{payload}"
-  client.manicure_plants(license, payload)
-
-  # Change growth phase in order
-  # to harvest the plant
-  # item = state[:items].sample
-  # payload = [
-  #   {
-  #     Id: nil,
-  #     Label: item,
-  #     NewTag: nil,
-  #     GrowthPhase: 'Flowering',
-  #     NewRoom: 'Plants Room',
-  #     NewLocation: 'Plants Room',
-  #     GrowthDate: '2020-06-03'
-  #   }
-  # ]
-  # p "Changing plant growth phase: #{payload}"
-  # client.change_plant_growth_phase(license, payload)
+  # p "Manicure plant: #{payload}"
+  # client.manicure_plants(license, payload)
 
   # Harvest plants
+  harvest_name = "1A4FF00000000C9000000715-harvest-2020-06-04"
   payload = [
     {
       Plant: item,
@@ -180,11 +165,79 @@ begin
       DryingLocation: 'X2',
       ActualDate: '2020-06-04',
       PatientLicenseNumber: nil,
-      HarvestName: nil
+      HarvestName: harvest_name
     }
   ]
-  p "Harvesting plant: #{payload}"
-  client.harvest_plants(license, payload)
+  # p "Harvesting plant: #{payload}"
+  # client.harvest_plants(license, payload)
+
+  # Harvest package
+  package = '1A4FF01000000C9000000602'
+  payload = [
+    {
+      Tag: package,
+      Location: 'X2',
+      Room: 'X2',
+      Item: 'DragonFly Clones',
+      UnitOfWeight: 'Grams',
+      PatientLicenseNumber: nil,
+      Note: 'This is a note',
+      IsProductionBatch: false,
+      ProductionBatchNumber: nil,
+      IsTradeSample: false,
+      IsDonation: false,
+      ProductRequiresRemediation: false,
+      RemediateProduct: false,
+      RemediationMethodId: nil,
+      RemediationDate: nil,
+      RemediationSteps: nil,
+      ActualDate: '2020-06-05',
+      Ingredients: [
+        {
+          HarvestName: harvest_name,
+          Weight: 100.23,
+          UnitOfWeight: 'Grams'
+        }
+      ]
+    }
+  ]
+  p "Creating a harvest package: #{payload}"
+  client.create_harvest_package(license, payload)
+
+  p "Getting harvests"
+  harvests = client.list_harvests(license)
+  harvest = harvests.find { |item| item['Name'] == harvest_name }
+  harvest_id = harvest['Id']
+
+  payload = [
+    {
+      WasteType: 'Plant Material',
+      UnitOfWeight: 'Grams',
+      WasteWeight: 10.05,
+      ActualDate: '2020-06-05',
+      Id: harvest_id
+    }
+  ]
+  p "Removing waste: #{payload}"
+  client.remove_waste(license, payload)
+
+  payload = [
+    {
+      Id: harvest_id,
+      ActualDate: '2020-06-06'
+    }
+  ]
+  p "Finishing a harvest: #{payload}"
+  client.finish_harvest(license, payload)
+
+  payload = [
+    {
+      Id: harvest_id
+    }
+  ]
+  p "Unfinishing a harvest: #{payload}"
+  client.unfinish_harvest(license, payload)
+
   p "Done on #{credentials['state'].upcase} state, with license #{license}!"
   p '#' * 120
 rescue => exception
