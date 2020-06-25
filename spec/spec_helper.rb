@@ -2,8 +2,8 @@ require 'yaml'
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-if File.exists?('./spec/spec_credentials.yml')
-  $spec_credentials = YAML.load_file('./spec/spec_credentials.yml')
+if File.exists?('./spec/spec_CA_credentials.yml')
+  $spec_credentials = YAML.load_file('./spec/spec_CA_credentials.yml')
 else
   $spec_credentials = {
     api_key: 'abc',
