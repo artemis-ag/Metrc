@@ -201,13 +201,13 @@ begin
       ]
     }
   ]
-  p "Creating a harvest package: #{payload}"
-  client.create_harvest_package(license, payload)
+  # p "Creating a harvest package: #{payload}"
+  # client.create_harvest_package(license, payload)
 
-  p "Getting harvests"
-  harvests = client.list_harvests(license)
-  harvest = harvests.find { |item| item['Name'] == harvest_name }
-  harvest_id = harvest['Id']
+  # p "Getting harvests"
+  # harvests = client.list_harvests(license)
+  # harvest = harvests.find { |item| item['Name'] == harvest_name }
+  harvest_id = nil # harvest['Id']
 
   payload = [
     {
@@ -218,8 +218,8 @@ begin
       Id: harvest_id
     }
   ]
-  p "Removing waste: #{payload}"
-  client.remove_waste(license, payload)
+  # p "Removing waste: #{payload}"
+  # client.remove_waste(license, payload)
 
   payload = [
     {
@@ -227,16 +227,115 @@ begin
       ActualDate: '2020-06-06'
     }
   ]
-  p "Finishing a harvest: #{payload}"
-  client.finish_harvest(license, payload)
+  # p "Finishing a harvest: #{payload}"
+  # client.finish_harvest(license, payload)
 
   payload = [
     {
       Id: harvest_id
     }
   ]
-  p "Unfinishing a harvest: #{payload}"
-  client.unfinish_harvest(license, payload)
+  # p "Unfinishing a harvest: #{payload}"
+  # client.unfinish_harvest(license, payload)
+
+  previous_package = package
+  package = '1A4FF01000000C9000000656'
+  payload = [
+    {
+      Tag: package,
+      Location: 'Greenhouse',
+      Room: 'Greenhouse',
+      Item: 'HBTHC Buds 2',
+      Quantity: 16.0,
+      UnitOfMeasure: 'Ounces',
+      PatientLicenseNumber: 'X00001',
+      Note: 'This is a note.',
+      IsProductionBatch: false,
+      ProductionBatchNumber: nil,
+      IsDonation: false,
+      ProductRequiresRemediation: false,
+      UseSameItem: false,
+      ActualDate: '2020-06-24',
+      Ingredients: [
+        {
+          Package: previous_package,
+          Quantity: 1.0,
+          UnitOfMeasure: 'Ounces'
+        }
+      ]
+    }
+  ]
+  # p "Creating package: #{payload}"
+  # client.create_package(license, payload)
+
+  payload = [
+    {
+      Label: package,
+      Item: 'Magnem Gilmore Buds'
+    }
+  ]
+  # p "Changing package item: #{payload}"
+  # client.change_package_item(license, payload)
+
+  payload = [
+    {
+      Label: package,
+      Quantity: 16.0,
+      UnitOfMeasure: 'Ounces',
+      AdjustmentReason: 'Drying',
+      AdjustmentDate: '2020-06-24',
+      ReasonNote: nil
+    }
+  ]
+  # p "Adjusting package: #{payload}"
+  # client.adjust_package(license, payload)
+
+  previous_package = package
+  package = '1A4FF01000000C9000000660'
+  payload = [
+    {
+      Tag: package,
+      Location: 'Greenhouse',
+      Room: 'Greenhouse',
+      Item: 'HBTHC Buds 2',
+      Quantity: 16.0,
+      UnitOfMeasure: 'Ounces',
+      PatientLicenseNumber: 'X00001',
+      Note: 'This is a note.',
+      IsProductionBatch: false,
+      ProductionBatchNumber: nil,
+      IsDonation: false,
+      ProductRequiresRemediation: false,
+      UseSameItem: false,
+      ActualDate: '2020-06-24',
+      Ingredients: [
+        {
+          Package: previous_package,
+          Quantity: 4.0,
+          UnitOfMeasure: 'Ounces'
+        }
+      ]
+    }
+  ]
+  p "Creating package: #{payload}"
+  client.create_package(license, payload)
+
+  payload = [
+    {
+      Label: previous_package,
+      ActualDate: '2020-06-24'
+    }
+  ]
+  p "Finishing package: #{payload}"
+  client.finish_package(license, payload)
+
+  payload = [
+    {
+      Label: previous_package
+    }
+  ]
+  p "Unfinishing a package: #{payload}"
+  client.unfinish_package(license, payload)
 
   p "Done on #{credentials['state'].upcase} state, with license #{license}!"
   p '#' * 120
