@@ -87,7 +87,7 @@ describe Metrc::Client do
   end
 
   context 'batches' do
-    context '#list_plant_batches' do
+    describe '#list_plant_batches' do
       before do
         stub_request(:get, "#{subject.uri}/plantbatches/v1/active?licenseNumber=#{licenseNumber}")
           .with(headers: headers)
@@ -96,6 +96,18 @@ describe Metrc::Client do
 
       it 'calls the endpoint' do
         expect { subject.list_plant_batches(licenseNumber) }.not_to raise_error
+      end
+    end
+
+    describe '#create_plant_batch_plantings' do
+      before do
+        stub_request(:post, "#{subject.uri}/plantbatches/v1/create/plantings?licenseNumber=#{licenseNumber}")
+          .with(headers: headers)
+          .to_return(body: nil)
+      end
+
+      it 'calls the endpoint' do
+        expect { subject.create_plant_batch_plantings(licenseNumber, []) }.not_to raise_error
       end
     end
   end
@@ -150,7 +162,7 @@ describe Metrc::Client do
         stub_request(:post, "#{subject.uri}/packages/v1/create/plantings?licenseNumber=#{licenseNumber}")
           .with(headers: headers)
           .to_return(body: nil)
-    end
+      end
 
       it 'calls the endpoint' do
         expect { subject.create_plantings_package(licenseNumber, []) }.not_to raise_error
@@ -349,7 +361,7 @@ describe Metrc::Client do
         stub_request(:delete, "#{subject.uri}/transfers/v1/templates/#{template_id}?licenseNumber=#{licenseNumber}")
           .with(headers: headers)
           .to_return(body: nil)
-    end
+      end
 
       let(:template_id) { 1 }
 
@@ -364,7 +376,7 @@ describe Metrc::Client do
         stub_request(:post, "#{subject.uri}/transfers/v1/templates?licenseNumber=#{licenseNumber}")
           .with(headers: headers)
           .to_return(body: nil)
-    end
+      end
 
       it 'calls the endpoint' do
         expect { subject.create_transfer_template(licenseNumber, []) }.not_to raise_error
@@ -379,7 +391,7 @@ describe Metrc::Client do
         stub_request(:get, "#{subject.uri}/transfers/v1/templates?licenseNumber=#{licenseNumber}#{query_params}")
           .with(headers: headers)
           .to_return(body: nil)
-    end
+      end
 
       it 'calls the endpoint' do
         expect { subject.list_transfer_templates(licenseNumber) }.not_to raise_error
