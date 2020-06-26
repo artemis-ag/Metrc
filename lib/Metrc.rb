@@ -12,7 +12,7 @@ module Metrc
     @configuration ||= Configuration.new
   end
 
-  def self.configure(&block) # rubocop:disable Lint/UnusedMethodArgument
+  def self.configure(&_block)
     yield configuration
   end
 end
