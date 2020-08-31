@@ -28,7 +28,7 @@ module Metrc
     end
 
     def api_get(url, options = {})
-      options.merge!(basic_auth: auth_headers) # rubocop:disable Performance/RedundantMerge
+      options[:basic_auth] = auth_headers
       puts "\nMetrc API Request debug\nclient.get('#{url}', #{options})\n########################\n" if debug
       self.response = self.class.get(url, options)
       raise_request_errors
@@ -39,7 +39,7 @@ module Metrc
     end
 
     def api_post(url, options = {})
-      options.merge!(basic_auth: auth_headers) # rubocop:disable Performance/RedundantMerge
+      options[:basic_auth] = auth_headers
       puts "\nMetrc API Request debug\nclient.post('#{url}', #{options})\n########################\n" if debug
       self.response = self.class.post(url, options)
       raise_request_errors
@@ -50,7 +50,7 @@ module Metrc
     end
 
     def api_delete(url, options = {})
-      options.merge!(basic_auth: auth_headers) # rubocop:disable Performance/RedundantMerge
+      options[:basic_auth] = auth_headers
       puts "\nMetrc API Request debug\nclient.delete('#{url}', #{options})\n########################\n" if debug
       self.response = self.class.delete(url, options)
       raise_request_errors
@@ -61,7 +61,7 @@ module Metrc
     end
 
     def api_put(url, options = {})
-      options.merge!(basic_auth: auth_headers) # rubocop:disable Performance/RedundantMerge
+      options[:basic_auth] = auth_headers
       puts "\nMetrc API Request debug\nclient.put('#{url}', #{options})\n########################\n" if debug
       self.response = self.class.put(url, options)
       raise_request_errors
@@ -155,17 +155,21 @@ module Metrc
     end
 
     def create_plant_batch_package(license_number, resources)
-      uri = if configuration.state.to_sym == :ca
-              '/plantbatches/v1/create/plantings'
-            else
-              '/plantbatches/v1/createpackages'
-            end
+      return self.create_plant_batch_plantings(license_number, resources) if configuration.state.to_sym == :ca
 
-      api_post("#{uri}?licenseNumber=#{license_number}", body: resources.to_json)
+      api_post("/plantbatches/v1/createpackages?licenseNumber=#{license_number}", body: resources.to_json)
+    end
+
+    def create_plant_batch_plantings(license_number, resources)
+      api_post("/plantbatches/v1/create/plantings?licenseNumber=#{license_number}", body: resources.to_json)
     end
 
     def create_plant_batch_package_from_mother(license_number, resources)
       api_post("/plantbatches/v1/create/packages/frommotherplant?licenseNumber=#{license_number}", body: resources.to_json)
+    end
+
+    def split_plant_batch(license_number, resources)
+      api_post("/plantbatches/v1/split?licenseNumber=#{license_number}", body: resources.to_json)
     end
 
     def list_plant_batches(license_number)
@@ -268,11 +272,16 @@ module Metrc
 
       raise Errors::NotFound.new("Package `#{label}` not found") if response.parsed_response.nil?
 
-      api_post("/labtests/v1/record?licenseNumber=#{license_number}", body: [{
-          Label: label,
-          ResultDate: results_date,
-          Results: sanitize(results)
-        }].to_json)
+      api_post(
+        "/labtests/v1/record?licenseNumber=#{license_number}",
+        body: [
+          {
+            Label: label,
+            ResultDate: results_date,
+            Results: sanitize(results)
+          }
+        ].to_json
+      )
     end
 
     # PLANTS
@@ -298,7 +307,8 @@ module Metrc
 
     def sanitize(results)
       allowed_test_types = labtest_types.map {|el| el['Name'] }
-      results.reject {|result| !allowed_test_types.include?(result[:LabTestTypeName]) } # rubocop:disable Style/InverseMethods
+
+      results.select {|result| !allowed_test_types.include?(result[:LabTestTypeName]) } # rubocop:disable Style/InverseMethods
     end
 
     def signed_in?
@@ -334,7 +344,7 @@ module Metrc
       self.uri
     end
 
-    def raise_request_errors # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
+    def raise_request_errors # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       return if response.success?
 
       raise Errors::BadRequest.new("An error has occurred while executing your request. #{Metrc::Errors.parse_request_errors(response: response)}") if response.bad_request?
