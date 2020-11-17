@@ -337,7 +337,7 @@ module Metrc
       self.uri
     end
 
-    def raise_request_errors # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def raise_request_errors # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       return if response.success?
 
       raise Errors::BadRequest.new("An error has occurred while executing your request. #{Metrc::Errors.parse_request_errors(response: response)}") if response.bad_request?
