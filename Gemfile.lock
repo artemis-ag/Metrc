@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    Metrc (0.3.2)
+    Metrc (0.4.0)
       bundler
       httparty
       rake
