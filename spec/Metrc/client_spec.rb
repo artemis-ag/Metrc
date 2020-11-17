@@ -99,15 +99,15 @@ describe Metrc::Client do
       end
     end
 
-    describe '#create_plant_batch_plantings' do
-      before do
-        stub_request(:post, "#{subject.uri}/plantbatches/v1/create/plantings?licenseNumber=#{licenseNumber}")
+    describe '#create_plant_batch_from_mother' do
+      before(:each) do
+        stub_request(:post, "#{subject.uri}/plants/v1/create/plantings?licenseNumber=#{licenseNumber}")
           .with(headers: headers)
           .to_return(body: nil)
       end
 
       it 'calls the endpoint' do
-        expect { subject.create_plant_batch_plantings(licenseNumber, []) }.not_to raise_error
+        expect { subject.create_plant_batch_from_mother(licenseNumber, []) }.not_to raise_error
       end
     end
 
@@ -132,7 +132,7 @@ describe Metrc::Client do
 
       context 'with a migrated state' do
         before do
-          stub_request(:post, "#{subject.uri}/plantbatches/v1/create/plantings?licenseNumber=#{licenseNumber}")
+          stub_request(:post, "#{subject.uri}/plantbatches/v1/createpackages?licenseNumber=#{licenseNumber}")
             .with(headers: headers)
             .to_return(body: nil)
         end

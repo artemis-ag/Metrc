@@ -155,13 +155,11 @@ module Metrc
     end
 
     def create_plant_batch_package(license_number, resources)
-      return self.create_plant_batch_plantings(license_number, resources) if configuration.state.to_sym == :ca
-
       api_post("/plantbatches/v1/createpackages?licenseNumber=#{license_number}", body: resources.to_json)
     end
 
-    def create_plant_batch_plantings(license_number, resources)
-      api_post("/plantbatches/v1/create/plantings?licenseNumber=#{license_number}", body: resources.to_json)
+    def create_plant_batch_from_mother(license_number, resources)
+      api_post("/plants/v1/create/plantings?licenseNumber=#{license_number}", body: resources.to_json)
     end
 
     def create_plant_batch_package_from_mother(license_number, resources)
